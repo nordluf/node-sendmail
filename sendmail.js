@@ -2,7 +2,7 @@
 const { createConnection } = require('net');
 const { connect } = require('tls');
 const { resolveMx } = require('dns');
-const { DKIMSign } = require('nodemailer/lib/dkim');
+const DKIM = require('nodemailer/lib/dkim');
 const CRLF = '\r\n';
 
 function dummy () {}
@@ -249,8 +249,10 @@ module.exports = function (options) {
               } else {
                 upgraded = true;
               }
+
+              break;
             }
-            break;
+            /* falls through */
 
           case 251: // forward
             if (step === queue.length - 1) {
@@ -365,20 +367,23 @@ module.exports = function (options) {
     const from = getAddress(mail.from);
     const srcHost = getHost(from);
 
-    const message = mailMe.compile();
-    message.build(function (err, message) {
-      if (err) {
-        logger.error('Error on creating message : ', err);
-        callback(err, null);
-        return;
-      }
-      if (dkimPrivateKey) {
-        const signature = DKIMSign(message, {
+    const messageObj = mailMe.compile();
+    if (dkimPrivateKey) {
+      messageObj.processFunc(input => {
+        const dkim = new DKIM({
           privateKey: dkimPrivateKey,
           keySelector: dkimKeySelector,
           domainName: srcHost
         });
-        message = signature + '\r\n' + message;
+        return dkim.sign(input);
+      });
+    }
+
+    messageObj.build(function (err, message) {
+      if (err) {
+        logger.error('Error on creating message : ', err);
+        callback(err, null);
+        return;
       }
       for (const domain in groups) {
         sendToSMTP(domain, srcHost, from, groups[domain], message, callback);

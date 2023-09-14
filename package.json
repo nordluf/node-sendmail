@@ -55,5 +55,8 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
-  }
+  },
+  "files": [
+    "sendmail.js"
+  ]
 }
