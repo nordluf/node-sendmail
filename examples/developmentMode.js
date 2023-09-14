@@ -1,4 +1,4 @@
-var sendmail = require('../sendmail')({silent: true, devPort: 1025})
+const sendmail = require('../sendmail')({ silent: true, devPort: 1025 });
 
 sendmail({
   from: 'test@yourdomain.com',
@@ -7,7 +7,6 @@ sendmail({
   subject: 'MailComposer sendmail',
   html: 'Mail of test sendmail'
 }, function (err, reply) {
-  console.log(err && err.stack)
-  console.dir(reply)
-})
-
+  console.log(err && err.stack);
+  console.dir(reply);
+});

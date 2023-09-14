@@ -1,32 +1,32 @@
-var icalToolkit = require('ical-toolkit')
-var sendmail = require('../sendmail')({silent: true})
+const icalToolkit = require('ical-toolkit');
+const sendmail = require('../sendmail')({ silent: true });
 
 // Create a builder
-var builder = icalToolkit.createIcsFileBuilder()
+const builder = icalToolkit.createIcsFileBuilder();
 
 /*
  * Settings (All Default values shown below. It is optional to specify)
  * */
-builder.spacers = true // Add space in ICS file, better human reading. Default: true
-builder.NEWLINE_CHAR = '\r\n' // Newline char to use.
-builder.throwError = false // If true throws errors, else returns error when you do .toString() to generate the file contents.
-builder.ignoreTZIDMismatch = true // If TZID is invalid, ignore or not to ignore!
+builder.spacers = true; // Add space in ICS file, better human reading. Default: true
+builder.NEWLINE_CHAR = '\r\n'; // Newline char to use.
+builder.throwError = false; // If true throws errors, else returns error when you do .toString() to generate the file contents.
+builder.ignoreTZIDMismatch = true; // If TZID is invalid, ignore or not to ignore!
 
 /**
  * Build ICS
  * */
 
 // Name of calander 'X-WR-CALNAME' tag.
-builder.calname = 'Yo Cal'
+builder.calname = 'Yo Cal';
 
 // Cal timezone 'X-WR-TIMEZONE' tag. Optional. We recommend it to be same as tzid.
-builder.timezone = 'america/new_york'
+builder.timezone = 'america/new_york';
 
 // Time Zone ID. This will automatically add VTIMEZONE info.
-builder.tzid = 'america/new_york'
+builder.tzid = 'america/new_york';
 
 // Method
-builder.method = 'REQUEST'
+builder.method = 'REQUEST';
 
 // Add events
 builder.events.push({
@@ -50,7 +50,7 @@ builder.events.push({
 
   // Optional: If you need to add some of your own tags
   additionalTags: {
-    'SOMETAG': 'SOME VALUE'
+    SOMETAG: 'SOME VALUE'
   },
 
   // Event identifier, Optional, default auto generated
@@ -112,19 +112,19 @@ builder.events.push({
 
   // Url for event on core application, Optional.
   url: 'http://google.com'
-})
+});
 
 // Optional tags on VCALENDAR level if you intent to add. Optional field
 builder.additionalTags = {
-  'SOMETAG': 'SOME VALUE'
-}
+  SOMETAG: 'SOME VALUE'
+};
 
 // Try to build
-var icsFileContent = builder.toString()
+const icsFileContent = builder.toString();
 
 // Check if there was an error (Only required if yu configured to return error, else error will be thrown.)
 if (icsFileContent instanceof Error) {
-  console.log('Returned Error, you can also configure to throw errors!')
+  console.log('Returned Error, you can also configure to throw errors!');
   // handle error
 }
 
@@ -139,7 +139,6 @@ sendmail({
     content: icsFileContent.toString()
   }]
 }, function (err, reply) {
-  console.log(err && err.stack)
-  console.dir(reply)
-})
-
+  console.log(err && err.stack);
+  console.dir(reply);
+});

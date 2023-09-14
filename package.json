@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "ical-toolkit": "^1.0.9",
+    "husky": "^4.0.0",
     "@commitlint/cli": "^17.0.0",
     "@commitlint/config-conventional": "^17.0.0",
     "@release-it/bumper": "^5.0.0",
@@ -52,5 +53,10 @@
   "bugs": {
     "url": "https://github.com/guileen/node-sendmail/issues"
   },
-  "homepage": "https://github.com/guileen/node-sendmail"
+  "homepage": "https://github.com/guileen/node-sendmail",
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  }
 }

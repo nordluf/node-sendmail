@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 const { createConnection } = require('net');
 const { connect } = require('tls');
 const { resolveMx } = require('dns');
@@ -8,12 +9,12 @@ function dummy () {}
 
 module.exports = function (options) {
   options = options || {};
-  const logger = options.logger || (options.silent && {
+  const logger = options.logger || ((options.silent && {
     debug: dummy,
     info: dummy,
     warn: dummy,
     error: dummy
-  } || {
+  }) || {
     debug: console.log,
     info: console.info,
     warn: console.warn,
@@ -57,12 +58,12 @@ module.exports = function (options) {
    */
 
   function getHost (email) {
-    const m = /[^@]+@([\w\d\-\.]+)/.exec(email);
+    const m = /[^@]+@([\w\d\-.]+)/.exec(email);
     return m && m[1];
   }
 
   function groupRecipients (recipients) {
-    let groups = {};
+    const groups = {};
     let host;
     const recipients_length = recipients.length;
     for (let i = 0; i < recipients_length; i++) {
@@ -188,13 +189,13 @@ module.exports = function (options) {
             if (upgraded === 'in-progress') {
               sock.removeAllListeners('data');
 
-              let original = sock;
+              const original = sock;
               original.pause();
 
-              let opts = {
+              const opts = {
                 socket: sock,
                 host: sock._host,
-                rejectUnauthorized,
+                rejectUnauthorized
               };
 
               sock = connect(
@@ -212,8 +213,6 @@ module.exports = function (options) {
 
                   sock.removeAllListeners('close');
                   sock.removeAllListeners('end');
-
-                  return;
                 }
               );
 
@@ -243,18 +242,17 @@ module.exports = function (options) {
             break;
           case 235: // verify ok
           case 250: // operation OK
-            if (upgraded != true) {
+            if (upgraded !== true) {
               if (/\bSTARTTLS\b/i.test(msg)) {
                 w('STARTTLS');
                 upgraded = 'in-progress';
               } else {
                 upgraded = true;
               }
-
-              break;
             }
+            break;
 
-          case 251: // foward
+          case 251: // forward
             if (step === queue.length - 1) {
               logger.info('OK:', code, msg);
               callback(null, msg);
@@ -294,7 +292,7 @@ module.exports = function (options) {
         if (line[3] === ' ') {
           // 250-information dash is not complete.
           // 250 OK. space is complete.
-          let lineNumber = parseInt(line.substr(0, 3));
+          const lineNumber = parseInt(line.substr(0, 3));
           response(lineNumber, msg);
           msg = '';
         }
@@ -350,8 +348,6 @@ module.exports = function (options) {
     const Mailcomposer = require('nodemailer/lib/mail-composer');
     const mailMe = new Mailcomposer(mail);
     let recipients = [];
-    let groups;
-    let srcHost;
     if (mail.to) {
       recipients = recipients.concat(getAddresses(mail.to));
     }
@@ -364,10 +360,10 @@ module.exports = function (options) {
       recipients = recipients.concat(getAddresses(mail.bcc));
     }
 
-    groups = groupRecipients(recipients);
+    const groups = groupRecipients(recipients);
 
     const from = getAddress(mail.from);
-    srcHost = getHost(from);
+    const srcHost = getHost(from);
 
     const message = mailMe.compile();
     message.build(function (err, message) {
@@ -384,7 +380,7 @@ module.exports = function (options) {
         });
         message = signature + '\r\n' + message;
       }
-      for (let domain in groups) {
+      for (const domain in groups) {
         sendToSMTP(domain, srcHost, from, groups[domain], message, callback);
       }
     });
