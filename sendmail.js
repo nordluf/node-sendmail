@@ -364,8 +364,23 @@ module.exports = function (options) {
 
     const groups = groupRecipients(recipients);
 
-    const from = getAddress(mail.from);
+    let from = getAddress(mail.from);
     const srcHost = getHost(from);
+
+    const returnPathKey = Object.keys(mail.headers || {}).find(i => i.toLowerCase() === 'return-path');
+    if (returnPathKey) {
+      const returnPath = mail.headers[returnPathKey].replaceAll(/^[\s<]+|[\s>]+$/g, '');
+      const returnPathHost = getHost(returnPath);
+      if (returnPathHost.toLowerCase() !== srcHost.toLowerCase()) {
+        throw new Error('Return-Path domain is not equal to the From domain, which is forbidden.');
+      }
+      from = returnPath;
+      Object.keys(mail.headers)
+        .filter(i => i.toLowerCase() === 'return-path')
+        .forEach(i => {
+          delete mail.headers[i];
+        });
+    }
 
     const messageObj = mailMe.compile();
     if (dkimPrivateKey) {
